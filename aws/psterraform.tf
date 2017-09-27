@@ -3,7 +3,7 @@ resource "aws_instance" "server" {
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     count = "${var.servers}"
-    security_groups = ["${aws_security_group.consul.name}"]
+    security_groups = ["${aws_security_group.ps-terraform.name}"]
 
     connection {
         user = "${lookup(var.user, var.platform)}"
@@ -12,35 +12,25 @@ resource "aws_instance" "server" {
 
     #Instance tags
     tags {
-        Name = "${var.tagName}-${count.index}"
-        ConsulRole = "Server"
+        Name = "${var.tagName}"
     }
 
     provisioner "file" {
-        source = "${path.module}/../shared/scripts/${lookup(var.service_conf, var.platform)}"
-        destination = "/tmp/${lookup(var.service_conf_dest, var.platform)}"
-    }
-
-
-    provisioner "remote-exec" {
-        inline = [
-            "echo ${var.servers} > /tmp/consul-server-count",
-            "echo ${aws_instance.server.0.private_dns} > /tmp/consul-server-addr",
-        ]
+        source = "${path.module}/../config/psft_customizations.yaml"
+        destination = "/tmp/psft_customizations.yaml"
     }
 
     provisioner "remote-exec" {
         scripts = [
-            "${path.module}/../shared/scripts/install.sh",
-            "${path.module}/../shared/scripts/service.sh",
             "${path.module}/../shared/scripts/ip_tables.sh",
+            "${path.module}/../shared/scripts/provision.sh",
         ]
     }
 }
 
-resource "aws_security_group" "consul" {
-    name = "consul_${var.platform}"
-    description = "Consul internal traffic + maintenance."
+resource "aws_security_group" "ps-terraform" {
+    name = "ps-terraform_${var.platform}"
+    description = "ps-terraform internal traffic + maintenance."
 
     // These are for internal traffic
     ingress {
@@ -65,6 +55,20 @@ resource "aws_security_group" "consul" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 
+    ingress {
+        from_port = 8000
+        to_port = 8000
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 1522
+        to_port = 1522
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
     // This is for outbound internet access
     egress {
         from_port = 0
@@ -72,4 +76,12 @@ resource "aws_security_group" "consul" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+}
+
+terraform {
+  backend "ps-terraform" {
+    address = "ec2-54-225-40-88.compute-1.amazonaws.com:8500"
+    path    = "terraform/state"
+    lock    = false
+  }
 }
