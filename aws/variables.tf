@@ -58,3 +58,7 @@ variable "mos_password" {
 variable "patch_id" {
   description = "My Oracle Support Patch Number for the PeopleSoft Image"
 }
+
+variable "dpk_install" {
+  description = "Folder on VM where the DPK will download"
+}

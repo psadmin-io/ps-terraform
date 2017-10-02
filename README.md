@@ -1,5 +1,15 @@
-# Terraform Modules
+# ps-terraform
 
-This folder contains modules for Terraform that can setup Consul for
-various systems. The infrastructure provider that is used is designated
-by the folder above. See the `variables.tf` file in each for more documentation. 
+Run PeopleSoft Images on multiple cloud providers
+
+## Getting Started
+
+1. Clone the Github repo
+1. Configure `terraform.tfvars`
+1. Save `config/psft_customizations.yaml.example` as `config/psft_customizations.yaml`
+1. `cd` into the cloud provider folder you want to use (e.g, `cd aws`)
+1. Initialize Terraform with `terraform init`
+1. Run `terraform plan` to view the infrasturcture to build
+1. Run `terraform apply` to build the PeopleSoft Image
+
+

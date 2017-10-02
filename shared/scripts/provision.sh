@@ -22,11 +22,12 @@ IFS=$'\n\t'     # Set the internal field separator to a tab and newline
 #  Variables  #
 ###############
 
-$MOS_USERNAME = "${var.mos_username}"
-$MOS_PASSWORD = "${var.mos_password}"
-$PATCH_ID = "${var.patch_id}"
+readonly MOS_USERNAME=$1
+readonly MOS_PASSWORD=$2
+readonly PATCH_ID=$3
+readonly DPK_INSTALL=$4
 
-#export DEBUG=true
+export DEBUG=true
 
 readonly TMPDIR="$(mktemp -d)"
 readonly COOKIE_FILE="${TMPDIR}/$$.cookies"
@@ -40,7 +41,7 @@ readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
 
-declare -a additional_packages=("vim-enhanced" "htop" "jq" "python-pip" "PyYAML" "python-requests")
+declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "aria2" "python-pip" "PyYAML" "python-requests")
 declare -A timings
 
 ###############
@@ -87,7 +88,8 @@ printf "\n\n"
 function check_dpk_install_dir() {
   if [[ ! -d "${DPK_INSTALL}" ]]; then
     echodebug "DPK installation directory ${DPK_INSTALL} does not exist"
-    mkdir -p "${DPK_INSTALL}"
+    sudo mkdir -p "${DPK_INSTALL}"
+    sudo chmod 777 "${DPK_INSTALL}"
   else
     echodebug "Found DPK installation directory ${DPK_INSTALL}"
   fi
@@ -96,7 +98,7 @@ function check_dpk_install_dir() {
 function check_vagabond_status() {
   if [[ ! -e "${VAGABOND_STATUS}" ]]; then
     echodebug "Vagabond status file ${VAGABOND_STATUS} does not exist"
-    cp /vagrant/scripts/vagabond.json "${DPK_INSTALL}"
+    cp /tmp/vagabond.json "${DPK_INSTALL}"
   else
     echodebug "Found Vagabond status file ${VAGABOND_STATUS}"
   fi
@@ -114,8 +116,10 @@ function update_packages() {
   local begin=$(date +%s)
   if [[ -n ${DEBUG+x} ]]; then
     sudo yum update -y
+    sudo yum install –y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   else
     sudo yum update -y > /dev/null 2>&1
+    sudo yum install –y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm > /dev/null 2>&1
   fi
   local end=$(date +%s)
   local tottime="$((end - begin))"
@@ -194,7 +198,8 @@ function download_patch_files() {
       --quiet=true \
       --file-allocation=none \
       --log="${DOWNLOAD_LOGFILE}" \
-      --log-level="info"
+      --log-level="info" \
+      --check-certificate=false
     record_step_success "${FUNCNAME[0]}"
     local end=$(date +%s)
     local tottime="$((end - begin))"
@@ -247,9 +252,9 @@ function determine_puppet_home() {
 function copy_customizations_file() {
   echoinfo "Copying customizations file"
   if [[ -n ${DEBUG+x} ]]; then
-    sudo cp -fv /vagrant/config/psft_customizations.yaml ${PUPPET_HOME}/data/psft_customizations.yaml
+    sudo cp -fv /tmp/psft_customizations.yaml ${PUPPET_HOME}/data/psft_customizations.yaml
   else
-    sudo cp -f /vagrant/config/psft_customizations.yaml ${PUPPET_HOME}/data/psft_customizations.yaml
+    sudo cp -f /tmp/psft_customizations.yaml ${PUPPET_HOME}/data/psft_customizations.yaml
   fi
 }
 

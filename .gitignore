@@ -1,2 +1,6 @@
+.terraform/*
+aws/.terraform/*
 terraform.tfvars
 psft_customizations.yaml
+*.tfstate
+*.backup

@@ -20,11 +20,27 @@ resource "aws_instance" "server" {
         destination = "/tmp/psft_customizations.yaml"
     }
 
+    provisioner "file" {
+        source = "${path.module}/../shared/scripts/vagabond.json"
+        destination = "/tmp/vagabond.json"
+    }
+
     provisioner "remote-exec" {
         scripts = [
-            "${path.module}/../shared/scripts/ip_tables.sh",
-            "${path.module}/../shared/scripts/provision.sh",
+            "${path.module}/../shared/scripts/ip_tables.sh"
         ]
+    }
+
+    provisioner "file" {
+        source = "${path.module}/../shared/scripts/provision.sh"
+        destination = "/tmp/provision.sh"
+    }
+
+    provisioner "remote-exec" {
+      inline = [
+        "chmod +x /tmp/provision.sh",
+        "/tmp/provision.sh ${var.mos_username} ${var.mos_password} ${var.patch_id} ${var.dpk_install}",
+      ]
     }
 }
 
@@ -79,9 +95,9 @@ resource "aws_security_group" "ps-terraform" {
 }
 
 terraform {
-  backend "ps-terraform" {
+  backend "consul" {
     address = "ec2-54-225-40-88.compute-1.amazonaws.com:8500"
-    path    = "terraform/state"
+    path    = "terraform/ps-terraform/state"
     lock    = false
   }
 }
