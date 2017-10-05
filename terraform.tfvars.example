@@ -1,3 +1,9 @@
 mos_username = ""
 mos_password = ""
 patch_id = ""
+dpk_install = "/media/sf_dpks"
+
+# AWS Variables
+key_name = ""
+key_path = ""
+region = ""
