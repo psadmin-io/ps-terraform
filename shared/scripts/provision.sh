@@ -41,7 +41,7 @@ readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
 
-declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "aria2" "python-pip" "PyYAML" "python-requests")
+declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "gcc" "gcc-c++" "openssl-devel" "aria2-1.32.0-1.el7.centos.x86_64")
 declare -A timings
 
 ###############
@@ -116,15 +116,36 @@ function update_packages() {
   local begin=$(date +%s)
   if [[ -n ${DEBUG+x} ]]; then
     sudo yum update -y
-    sudo yum install –y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    curl -s https://packagecloud.io/install/repositories/jrbing/ps-extras/script.rpm.sh | sudo bash 
   else
     sudo yum update -y > /dev/null 2>&1
-    sudo yum install –y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm > /dev/null 2>&1
+    sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm > /dev/null 2>&1
+    curl -s https://packagecloud.io/install/repositories/jrbing/ps-extras/script.rpm.sh | sudo bash > /dev/null 2>&1
   fi
   local end=$(date +%s)
   local tottime="$((end - begin))"
   timings[update_packages]=$tottime
 }
+
+# function build_aria2() {
+#   echoinfo "Building aria2c"
+#   local begin=$(date +%s)
+#   if [[ -n ${DEBUG+x} ]]; then
+#     wget https://github.com/aria2/aria2/releases/download/release-1.32.0/aria2-1.32.0.tar.gz
+#     tar xvf aria2-1.32.0.tar.gz
+#     cd ~/aria2-1.32.0
+#     sudo ./configure && sudo make && sudo make install
+#   else
+#     wget https://github.com/aria2/aria2/releases/download/release-1.32.0/aria2-1.32.0.tar.gz > /dev/null 2>&1
+#     tar xvf aria2-1.32.0.tar.gz > /dev/null 2>&1
+#     cd ~/aria2-1.32.0 > /dev/null 2>&1
+#     sudo ./configure && sudo make && sudo make install > /dev/null 2>&1
+#   fi
+#   local end=$(date +%s)
+#   local tottime="$((end - begin))"
+#   timings[update_packages]=$tottime
+# }
 
 function install_additional_packages() {
   local begin=$(date +%s)
@@ -132,9 +153,9 @@ function install_additional_packages() {
   for package in "${additional_packages[@]}"; do
     if [[ -n ${DEBUG+x} ]]; then
       echodebug "Installing ${package}"
-      sudo yum install -y "${package}"
+      sudo yum -y install "${package}"
     else
-      sudo yum install -y "${package}" > /dev/null 2>&1
+      sudo yum -y install "${package}" > /dev/null 2>&1
     fi
   done
   local end=$(date +%s)
@@ -429,6 +450,7 @@ check_dpk_install_dir
 check_vagabond_status
 update_packages
 install_additional_packages
+# build_aria2
 
 # Downloading and unpacking patch files
 download_patch_files

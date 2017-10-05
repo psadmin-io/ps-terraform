@@ -1,9 +1,12 @@
-resource "aws_instance" "server" {
+resource "aws_instance" "vagabond" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
-    count = "${var.servers}"
     security_groups = ["${aws_security_group.ps-terraform.name}"]
+
+    root_block_device {
+        volume_size = "200"
+    }
 
     connection {
         user = "${lookup(var.user, var.platform)}"
