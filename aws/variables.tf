@@ -38,7 +38,7 @@ variable "servers" {
 }
 
 variable "instance_type" {
-  default     = "t2.medium"
+  default     = "m4.large" # 2 CPU, 8GB RAM, Moderate performance
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
 }
 

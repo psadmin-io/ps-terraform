@@ -9,4 +9,4 @@ key_path = ""
 
 # Optional AWS Variables
 region = "" # Default is us-east-1
-instance_type = "" # Default is t2.medium
+instance_type = "" # Default is m4.large
