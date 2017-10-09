@@ -4,6 +4,14 @@ resource "aws_instance" "vagabond" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform.name}"]
 
+    user_data =  <<HEREDOC
+#!/bin/bash
+dd if=/dev/zero of=/swapfile bs=1024 count=4096000
+chmod 0600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+HEREDOC
+
     root_block_device {
         volume_size = "200"
     }
@@ -95,12 +103,4 @@ resource "aws_security_group" "ps-terraform" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
-}
-
-terraform {
-  backend "consul" {
-    address = "ec2-54-225-40-88.compute-1.amazonaws.com:8500"
-    path    = "terraform/ps-terraform/state"
-    lock    = false
-  }
 }

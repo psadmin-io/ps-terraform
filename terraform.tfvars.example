@@ -6,4 +6,7 @@ dpk_install = "/media/sf_dpks"
 # AWS Variables
 key_name = ""
 key_path = ""
-region = ""
+
+# Optional AWS Variables
+region = "" # Default is us-east-1
+instance_type = "" # Default is t2.medium

@@ -4,3 +4,4 @@ aws/terraform.tfvars
 config/psft_customizations.yaml
 *.tfstate
 *.backup
+*/backends.tf
