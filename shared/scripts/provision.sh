@@ -319,7 +319,7 @@ function execute_puppet_apply() {
   case ${TOOLS_MINOR_VERSION} in
     "55" )
         if [[ -n ${DEBUG+x} ]]; then
-          sudo puppet apply --verbose "${PUPPET_HOME}/manifests/site.pp"
+          sudo puppet apply --verbose --debug "${PUPPET_HOME}/manifests/site.pp"
         else
           sudo puppet apply "${PUPPET_HOME}/manifests/site.pp" > /dev/null 2>&1
         fi
@@ -328,7 +328,8 @@ function execute_puppet_apply() {
         if [[ -n ${DEBUG+x} ]]; then
           sudo puppet apply \
             --confdir="${PSFT_BASE_DIR}/dpk/puppet" \
-            --verbose \
+            --verbose \ 
+            --debug \
             "${PUPPET_HOME}/production/manifests/site.pp"
         else
           sudo puppet apply \
