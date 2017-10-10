@@ -41,7 +41,7 @@ readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
 
-declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "gcc" "gcc-c++" "openssl-devel" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio")
+declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "gcc" "gcc-c++" "openssl-devel" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio" "samba")
 declare -A timings
 
 ###############
