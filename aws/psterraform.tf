@@ -1,3 +1,7 @@
+provider "aws" {
+  region     = "${var.region}"
+}
+
 resource "aws_instance" "vagabond" {
     ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
     instance_type = "${var.instance_type}"
