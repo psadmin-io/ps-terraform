@@ -1,5 +1,5 @@
 variable "platform" {
-    default = "ubuntu"
+    default = "rhel7"
     description = "The OS Platform"
 }
 

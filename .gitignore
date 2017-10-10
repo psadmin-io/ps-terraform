@@ -1,0 +1,8 @@
+.terraform/*
+*/.terraform*
+*/psterraform.tfvars
+config/psft_customizations.yaml
+*.tfstate
+*.backup
+*/backends.tf
+google/*.json

@@ -1,3 +1,8 @@
+provider "google" {
+  credentials = "${file("${var.key}")}"
+  region      = "${var.region}"
+}
+
 resource "google_compute_instance" "consul" {
     count = "${var.servers}"
 
@@ -7,8 +12,10 @@ resource "google_compute_instance" "consul" {
 
     machine_type = "${var.machine_type}"
 
-    disk {
-        image = "${lookup(var.machine_image, var.platform)}"
+    boot_disk {
+        initialize_params {
+            image = "${lookup(var.machine_image, var.platform)}"
+        }
     }
 
     network_interface {
