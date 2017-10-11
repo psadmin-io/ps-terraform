@@ -54,7 +54,7 @@ HEREDOC
     provisioner "remote-exec" {
       inline = [
         "chmod +x /tmp/provision.sh",
-        "/tmp/provision.sh ${var.mos_username} ${var.mos_password} ${var.patch_id} ${var.dpk_install}",
+        "/tmp/provision.sh ${var.mos_username} ${var.mos_password} ${var.patch_id} /media/sf_${var.patch_id}",
       ]
     }
 }
