@@ -1,7 +1,6 @@
 mos_username = ""
 mos_password = ""
 patch_id = ""
-dpk_install = "/media/sf_dpks"
 
 # AWS Variables
 key_name = ""
@@ -9,4 +8,4 @@ key_path = ""
 
 # Optional AWS Variables
 region = "" # Default is us-east-1
-instance_type = "" # Default is m4.large
+instance_type = "" # Default is t2.large

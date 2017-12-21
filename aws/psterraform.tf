@@ -3,21 +3,26 @@ provider "aws" {
 }
 
 resource "aws_instance" "vagabond" {
-    ami = "${lookup(var.ami, "${var.region}-${var.platform}")}"
+    ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform.name}"]
+    count = "${var.servers}"
 
     user_data =  <<HEREDOC
-#!/bin/bash
-dd if=/dev/zero of=/swapfile bs=1024 count=4096000
-chmod 0600 /swapfile
-mkswap /swapfile
-swapon /swapfile
+#! /bin/bash    
+mkswap -f /dev/xvdb
+swapon /dev/xvdb
+sed -i '$a/dev/xvdb   none    swap    sw    0   0' /etc/fstab
 HEREDOC
 
     root_block_device {
         volume_size = "200"
+    }
+
+    ebs_block_device {
+        device_name = "/dev/sdb"
+        volume_size = "4"
     }
 
     connection {
@@ -27,7 +32,7 @@ HEREDOC
 
     #Instance tags
     tags {
-        Name = "${var.tagName}"
+        Name = "${var.tagName}-${var.patch_id}-${count.index}"
     }
 
     provisioner "file" {

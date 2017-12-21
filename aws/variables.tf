@@ -11,12 +11,8 @@ variable "user" {
 
 variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types "
-
-  default = {
-    us-east-1-rhel7       = "ami-2051294a"
-    us-east-2-rhel7       = "ami-0a33696f"
-    us-west-2-rhel7       = "ami-775e4f16"
-  }
+  # default = "ami-bf36fec5" # ps-vagabond-rhel-aws 1.0.0
+  default = "ami-c998b6b2" # AWS RHEL 7.4
 }
 
 variable "key_name" {
@@ -38,7 +34,7 @@ variable "servers" {
 }
 
 variable "instance_type" {
-  default     = "m4.large" # 2 CPU, 8GB RAM, Moderate performance
+  default     = "t2.large" # 2 CPU, 8GB RAM, Moderate performance
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
 }
 
@@ -59,6 +55,11 @@ variable "patch_id" {
   description = "My Oracle Support Patch Number for the PeopleSoft Image"
 }
 
-variable "dpk_install" {
-  description = "Folder on VM where the DPK will download"
-}
+# resource "template_file" "dpk_install" {
+#   template = "$/media/sf_${var.patch_id}"
+# }
+
+# variable "dpk_install" {
+#   description = "Folder on VM where the DPK will download"
+#   default = "/media/sf_${var.patch_id}"
+# }
