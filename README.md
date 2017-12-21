@@ -5,6 +5,7 @@ Run PeopleSoft Images on multiple cloud providers
 ## Required Software
 
 1. Terraform
+1. A Cloud Provider Account (e.g, AWS)
 
 ## Optional Software (but highly recommended)
 
@@ -41,13 +42,10 @@ $PATH=$PATH:/opt/terraform
 ### Clone the GitHub Repository
 
 1. Clone the Github repository to your computer
-
 ```
 git clone https://github.com/psadmin-io/ps-terraform.git
 ```
-
 1. Save the `psterraform.tfvars.example` to `aws\psterraform.tfvars`
-
 ```ini
 mos_username = "dan@company.com"
 mos_password = "somethingsecure"
@@ -65,7 +63,6 @@ instance_type = "" # Default is t2.large
 # Default is 1
 # servers = "2"
 ```
-
 1. Save `config/psft_customizations.yaml.example` as `config/psft_customizations.yaml`. Make sure the `db_user` account is appropriate for the Image.
 
 | App | DB User |
