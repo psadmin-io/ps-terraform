@@ -27,7 +27,7 @@ readonly MOS_PASSWORD=$2
 readonly PATCH_ID=$3
 readonly DPK_INSTALL=$4
 
-export DEBUG=true
+# export DEBUG=true
 
 readonly TMPDIR="$(mktemp -d)"
 readonly COOKIE_FILE="${TMPDIR}/$$.cookies"
