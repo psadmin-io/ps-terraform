@@ -2,19 +2,6 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-data "template_file" "init" {
-    template = <<EOF
-  winrm quickconfig -q & winrm set winrm/config/winrs @{MaxMemoryPerShellMB="300"} & winrm set winrm/config @{MaxTimeoutms="1800000"} & winrm set winrm/config/service @{AllowUnencrypted="true"} & winrm set winrm/config/service/auth @{Basic="true"}
-  netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
-  $admin = [ADSI]("WinNT://./administrator, user")
-  $admin.SetPassword("${var.admin_password}")
-EOF
-
-  vars {
-    admin_password = "${var.admin_password}"
-  }
-}
-
 resource "aws_instance" "vagabond-win" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
@@ -39,14 +26,25 @@ resource "aws_instance" "vagabond-win" {
       type = "winrm"
       user = "Administrator"
       password = "${var.admin_password}"
+      timeout = "10m"
     }
-
-    user_data = "${data.template_file.init.rendered}"
 
     #Instance tags
     tags {
-        Name = "${var.tagName}-${var.patch_id}-${count.index}"
+        Name = "${var.tagName}-win-${var.patch_id}-${count.index}"
     }
+
+    user_data = <<EOF
+<script>
+  winrm quickconfig -q & winrm set winrm/config @{MaxTimeoutms="1800000"} & winrm set winrm/config/service @{AllowUnencrypted="true"} & winrm set winrm/config/service/auth @{Basic="true"}
+</script>
+<powershell>
+  netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
+  # Set Administrator password
+  $admin = [adsi]("WinNT://./administrator, user")
+  $admin.psbase.invoke("SetPassword", "${var.admin_password}")
+</powershell>
+EOF
 
     provisioner "file" {
         source = "${path.module}/../config/psft_customizations.yaml"
@@ -109,7 +107,7 @@ resource "aws_security_group" "ps-terraform" {
     // These are for maintenance
     ingress {
         from_port = 5985
-        to_port = 5985
+        to_port = 5986
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }

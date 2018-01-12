@@ -32,7 +32,7 @@ HEREDOC
 
     #Instance tags
     tags {
-        Name = "${var.tagName}-${var.patch_id}-${count.index}"
+        Name = "${var.tagName}-lnx-${var.patch_id}-${count.index}"
     }
 
     provisioner "file" {
