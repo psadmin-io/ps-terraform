@@ -47,7 +47,7 @@ resource "aws_instance" "vagabond-win" {
 EOF
 
     provisioner "file" {
-        source = "${path.module}/../config/psft_customizations.yaml"
+        source = "${path.module}/../config/psft_customizations-win.yaml"
         destination = "c:/vagrant/config/psft_customizations.yaml"
     }
 
@@ -66,23 +66,86 @@ EOF
         source = "${path.module}/../shared/scripts/win/banner.ps1"
         destination = "c:/temp/banner.ps1"
     }
-
-    provisioner "remote-exec" {
-      inline = [
-        "c:/temp/banner.ps1",
-      ]
-    }
-
     provisioner "file" {
         source = "${path.module}/../shared/scripts/win/provision-download.ps1"
         destination = "c:/temp/provision-download.ps1"
+    }    
+    provisioner "file" {
+        source = "${path.module}/../shared/scripts/win/provision-bootstrap-ps.ps1"
+        destination = "c:/temp/provision-bootstrap-ps.ps1"
+    }
+    provisioner "file" {
+        source = "${path.module}/../shared/scripts/win/provision-yaml.ps1"
+        destination = "c:/temp/provision-yaml.ps1"
+    }
+    provisioner "file" {
+        source = "${path.module}/../shared/scripts/win/provision-puppet-apply.ps1"
+        destination = "c:/temp/provision-puppet-apply.ps1"
     }
 
+
     provisioner "remote-exec" {
+      connection = {
+        type        = "winrm"
+        user        = "Administrator"
+        password    = "${var.admin_password}"
+        agent       = "false"
+      }
       inline = [
-        "c:/temp/provision-download.ps1 -MOS_USERNAME ${var.mos_username} -MOS_PASSWORD ${var.mos_password} -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id}",
+        "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+        "powershell.exe -ExecutionPolicy Bypass -File C:\\temp\\banner.ps1"
       ]
     }
+    provisioner "remote-exec" {
+      connection = {
+        type        = "winrm"
+        user        = "Administrator"
+        password    = "${var.admin_password}"
+        agent       = "false"
+      }
+      inline = [
+        "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+        "powershell.exe -ExecutionPolicy Bypass -Command 'New-Item -ItemType directory -Path c:/psft/dpk/downloads'",
+        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-download.ps1 -MOS_USERNAME ${var.mos_username} -MOS_PASSWORD ${var.mos_password} -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id}'",
+      ]
+    }
+    provisioner "remote-exec" {
+      connection = {
+        type        = "winrm"
+        user        = "Administrator"
+        password    = "${var.admin_password}"
+        agent       = "false"
+      }
+      inline = [
+        "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-bootstrap-ps.ps1 -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+      ]
+    }
+    provisioner "remote-exec" {
+      connection = {
+        type        = "winrm"
+        user        = "Administrator"
+        password    = "${var.admin_password}"
+        agent       = "false"
+      }
+      inline = [
+        "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-yaml.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+      ]
+    }
+    provisioner "remote-exec" {
+      connection = {
+        type        = "winrm"
+        user        = "Administrator"
+        password    = "${var.admin_password}"
+        agent       = "false"
+      }
+      inline = [
+        "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-puppet-apply.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+      ]
+    }
+    
 }
 
 resource "aws_security_group" "ps-terraform" {
