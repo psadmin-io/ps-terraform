@@ -2,66 +2,33 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-resource "aws_instance" "vagabond-win" {
+resource "aws_instance" "vagabond_win" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform.name}"]
     count = "${var.servers}"
-
+    user_data = "${file("user_data.cfg")}"
     root_block_device {
         volume_size = "200"
     }
-
-    # ebs_block_device {
-    #     device_name = "/dev/sdb"
-    #     volume_size = "4"
-    # }
-
-    # connection {
-    #     user = "${lookup(var.user, var.platform)}"
-    #     private_key = "${file("${var.key_path}")}"
-    # }
     connection {
       type = "winrm"
       user = "Administrator"
       password = "${var.admin_password}"
       timeout = "10m"
     }
-
-    #Instance tags
     tags {
         Name = "${var.tagName}-win-${var.patch_id}-${count.index}"
     }
-
-    user_data = <<EOF
-<script>
-  winrm quickconfig -q & winrm set winrm/config @{MaxTimeoutms="1800000"} & winrm set winrm/config/service @{AllowUnencrypted="true"} & winrm set winrm/config/service/auth @{Basic="true"}
-</script>
-<powershell>
-  netsh advfirewall firewall add rule name="WinRM in" protocol=TCP dir=in profile=any localport=5985 remoteip=any localip=any action=allow
-  # Set Administrator password
-  $admin = [adsi]("WinNT://./administrator, user")
-  $admin.psbase.invoke("SetPassword", "${var.admin_password}")
-</powershell>
-EOF
-
     provisioner "file" {
         source = "${path.module}/../config/psft_customizations-win.yaml"
         destination = "c:/vagrant/config/psft_customizations.yaml"
     }
-
     provisioner "file" {
         source = "${path.module}/../shared/scripts/vagabond.json"
         destination = "C:/vagrant/scripts/vagabond.json"
     }
-
-    # provisioner "remote-exec" {
-    #     scripts = [
-    #         "${path.module}/../shared/scripts/ip_tables.sh"
-    #     ]
-    # }
-
     provisioner "file" {
         source = "${path.module}/../shared/scripts/win/banner.ps1"
         destination = "c:/temp/banner.ps1"
@@ -106,7 +73,7 @@ EOF
       inline = [
         "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
         "powershell.exe -ExecutionPolicy Bypass -Command 'New-Item -ItemType directory -Path c:/psft/dpk/downloads'",
-        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-download.ps1 -MOS_USERNAME ${var.mos_username} -MOS_PASSWORD ${var.mos_password} -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id}'",
+        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-download.ps1 -MOS_USERNAME ${var.mos_username} -MOS_PASSWORD ${var.mos_password} -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id}",
       ]
     }
     provisioner "remote-exec" {
@@ -118,7 +85,7 @@ EOF
       }
       inline = [
         "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
-        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-bootstrap-ps.ps1 -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-bootstrap-ps.ps1 -PATCH_ID ${var.patch_id} -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
       ]
     }
     provisioner "remote-exec" {
@@ -130,7 +97,7 @@ EOF
       }
       inline = [
         "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
-        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-yaml.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-yaml.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
       ]
     }
     provisioner "remote-exec" {
@@ -142,10 +109,10 @@ EOF
       }
       inline = [
         "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
-        "powershell.exe-ExecutionPolicy Bypass -File c:\\temp\\provision-puppet-apply.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+        "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-puppet-apply.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
       ]
     }
-    
+
 }
 
 resource "aws_security_group" "ps-terraform" {

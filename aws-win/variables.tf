@@ -55,7 +55,7 @@ variable "patch_id" {
 }
 
 variable "admin_password" {
-  default = "T3rraf0rm$"
+  default = "Passw0rd!"
   description = "Windows Administrator password"
 }
 # resource "template_file" "dpk_install" {

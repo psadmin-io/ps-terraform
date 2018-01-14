@@ -8,13 +8,7 @@ resource "aws_instance" "vagabond-lnx" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform.name}"]
     count = "${var.servers}"
-
-    user_data =  <<HEREDOC
-#! /bin/bash    
-mkswap -f /dev/xvdb
-swapon /dev/xvdb
-sed -i '$a/dev/xvdb   none    swap    sw    0   0' /etc/fstab
-HEREDOC
+    user_data = "${file("user_data.cfg")}"
 
     root_block_device {
         volume_size = "200"
