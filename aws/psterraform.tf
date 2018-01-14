@@ -2,11 +2,11 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-resource "aws_instance" "vagabond-lnx" {
+resource "aws_instance" "vagabond_lnx" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
-    security_groups = ["${aws_security_group.ps-terraform.name}"]
+    security_groups = ["${aws_security_group.ps-terraform-lnx.name}"]
     count = "${var.servers}"
     user_data = "${file("user_data.cfg")}"
 
@@ -58,7 +58,7 @@ resource "aws_instance" "vagabond-lnx" {
     }
 }
 
-resource "aws_security_group" "ps-terraform" {
+resource "aws_security_group" "ps-terraform-lnx" {
     name = "ps-terraform_${var.platform}"
     description = "ps-terraform internal traffic + maintenance."
 
@@ -86,13 +86,6 @@ resource "aws_security_group" "ps-terraform" {
     }
 
     ingress {
-        from_port = 8000
-        to_port = 8000
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
-
-    ingress {
         from_port = 1522
         to_port = 1522
         protocol = "tcp"
@@ -100,8 +93,8 @@ resource "aws_security_group" "ps-terraform" {
     }
 
     ingress {
-        from_port = 3389
-        to_port = 3389
+        from_port = 8000
+        to_port = 8000
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }

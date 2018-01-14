@@ -3,6 +3,9 @@ variable "platform" {
   description = "The OS Platform"
 }
 
+variable "machine_name" {
+  description   = "Server name"
+}
 variable "user" {
   default = {
     win2016   = "Administrator"

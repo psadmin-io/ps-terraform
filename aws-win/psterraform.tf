@@ -6,7 +6,7 @@ resource "aws_instance" "vagabond_win" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
-    security_groups = ["${aws_security_group.ps-terraform.name}"]
+    security_groups = ["${aws_security_group.ps-terraform-win.name}"]
     count = "${var.servers}"
     user_data = "${file("user_data.cfg")}"
     root_block_device {
@@ -115,7 +115,7 @@ resource "aws_instance" "vagabond_win" {
 
 }
 
-resource "aws_security_group" "ps-terraform" {
+resource "aws_security_group" "ps-terraform-win" {
     name = "ps-terraform_${var.platform}"
     description = "ps-terraform internal traffic + maintenance."
 
