@@ -2,13 +2,21 @@ provider "aws" {
   region     = "${var.region}"
 }
 
+data "template_file" "user_data" {
+    template = "user_data.ps1"
+    vars {
+      admin_password  = "${var.admin_password}"
+      machine_name    = "${var.machine_name}"
+    }
+}
+
 resource "aws_instance" "vagabond_win" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform-win.name}"]
     count = "${var.servers}"
-    user_data = "${file("user_data.cfg")}"
+    user_data = "${data.template_file.user_data.rendered}"
     root_block_device {
         volume_size = "200"
     }
@@ -117,7 +125,7 @@ resource "aws_instance" "vagabond_win" {
 
 resource "aws_security_group" "ps-terraform-win" {
     name = "ps-terraform_${var.platform}"
-    description = "ps-terraform internal traffic + maintenance."
+    description = "ps-terraform windows internal traffic + maintenance."
 
     // These are for internal traffic
     ingress {

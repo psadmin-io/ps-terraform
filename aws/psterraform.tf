@@ -2,13 +2,22 @@ provider "aws" {
   region     = "${var.region}"
 }
 
+data "template_file" "user_data_lnx" {
+  template = "${file("user_data.cfg")}"
+  vars {
+    admin_password = "${var.admin_password}"
+    machine_name   = "${var.machine_name}"
+    
+  }
+}
+
 resource "aws_instance" "vagabond_lnx" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform-lnx.name}"]
     count = "${var.servers}"
-    user_data = "${file("user_data.cfg")}"
+    user_data = "${data.template_file.user_data_lnx.rendered}"
 
     root_block_device {
         volume_size = "200"
@@ -60,7 +69,7 @@ resource "aws_instance" "vagabond_lnx" {
 
 resource "aws_security_group" "ps-terraform-lnx" {
     name = "ps-terraform_${var.platform}"
-    description = "ps-terraform internal traffic + maintenance."
+    description = "ps-terraform linux internal traffic + maintenance."
 
     // These are for internal traffic
     ingress {
