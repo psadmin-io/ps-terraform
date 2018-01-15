@@ -2,8 +2,8 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-data "template_file" "user_data" {
-    template = "user_data.ps1"
+data "template_file" "user_data_win" {
+    template = "${file("user_data.ps1")}"
     vars {
       admin_password  = "${var.admin_password}"
       machine_name    = "${var.machine_name}"
@@ -16,7 +16,7 @@ resource "aws_instance" "vagabond_win" {
     key_name = "${var.key_name}"
     security_groups = ["${aws_security_group.ps-terraform-win.name}"]
     count = "${var.servers}"
-    user_data = "${data.template_file.user_data.rendered}"
+    user_data = "${data.template_file.user_data_win.rendered}"
     root_block_device {
         volume_size = "200"
     }

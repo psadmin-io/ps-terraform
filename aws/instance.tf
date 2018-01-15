@@ -39,7 +39,7 @@ resource "aws_instance" "vagabond_lnx" {
     }
 
     provisioner "file" {
-        source = "${path.module}/../config/psft_customizations.yaml"
+        source = "${path.module}/../config/psft_customizations-lnx.yaml"
         destination = "/tmp/psft_customizations.yaml"
     }
 
