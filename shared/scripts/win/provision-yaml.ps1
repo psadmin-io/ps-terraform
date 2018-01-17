@@ -70,6 +70,10 @@ function determine_puppet_home() {
       Default { Write-Host "PeopleTools version could not be determined in the bs-manifest file."}
   }  
 
+  if (!(Test-Path $PUPPET_HOME)) {
+    New-Item -Type directory -Path $PUPPET_HOME
+  }
+
   if ($DEBUG -eq "true" ) {
       Write-Host "Tools Minor Version: ${TOOLS_MINOR_VERSION}"
       Write-Host "Puppet Home Directory: ${PUPPET_HOME}"
@@ -79,6 +83,9 @@ function copy_customizations_file() {
   Write-Host "Copying customizations file"
   switch ($TOOLS_MINOR_VERSION) {
     "56" {
+        if (!(Test-Path $PUPPET_HOME\production\data)) {
+          New-Item -Type directory -Path $PUPPET_HOME\production\data
+        }
       if ($DEBUG -eq "true") {
         Write-Host "Copying to ${PUPPET_HOME}\production\data"
         Copy-Item "c:\vagrant\config\psft_customizations.yaml" "${PUPPET_HOME}\production\data\psft_customizations.yaml" -Force
@@ -87,6 +94,9 @@ function copy_customizations_file() {
       }
     }
     "55" {
+        if (!(Test-Path $PUPPET_HOME\data)) {
+          New-Item -Type directory -Path $PUPPET_HOME\data
+        }
       if ($DEBUG -eq "true") {
         Write-Host "Copying to ${PUPPET_HOME}\data"
         Copy-Item "c:\vagrant\config\psft_customizations.yaml" "${PUPPET_HOME}\data\psft_customizations.yaml" -Force
