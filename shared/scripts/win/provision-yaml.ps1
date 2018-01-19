@@ -71,7 +71,7 @@ function determine_puppet_home() {
   }  
 
   if (!(Test-Path $PUPPET_HOME)) {
-    New-Item -Type directory -Path $PUPPET_HOME
+    New-Item -ItemType directory -Path $PUPPET_HOME
   }
 
   if ($DEBUG -eq "true" ) {
@@ -84,7 +84,7 @@ function copy_customizations_file() {
   switch ($TOOLS_MINOR_VERSION) {
     "56" {
         if (!(Test-Path $PUPPET_HOME\production\data)) {
-          New-Item -Type directory -Path $PUPPET_HOME\production\data
+          New-Item -ItemType directory -Path $PUPPET_HOME\production\data
         }
       if ($DEBUG -eq "true") {
         Write-Host "Copying to ${PUPPET_HOME}\production\data"
@@ -95,7 +95,7 @@ function copy_customizations_file() {
     }
     "55" {
         if (!(Test-Path $PUPPET_HOME\data)) {
-          New-Item -Type directory -Path $PUPPET_HOME\data
+          New-Item -ItemType directory -Path $PUPPET_HOME\data
         }
       if ($DEBUG -eq "true") {
         Write-Host "Copying to ${PUPPET_HOME}\data"

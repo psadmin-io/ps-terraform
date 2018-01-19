@@ -11,4 +11,10 @@ function echobanner {
   Write-Host "`n`n"
 }
 
+function install_powershell () {
+  (Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')))
+  C:\ProgramData\chocolatey\bin\choco.exe install powershell -y
+  Restart-Computer
+}
 . echobanner
+# . install_powershell

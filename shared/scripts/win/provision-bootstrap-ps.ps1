@@ -53,6 +53,15 @@ $VerbosePreference = "SilentlyContinue"
 
 $DEBUG = "true"
 
+function update_hosts_file() {
+    $ip = (iwr http://169.254.169.254/latest/meta-data/local-ipv4).content
+    $hostname = hostname
+    $hosts = "C:\Windows\System32\drivers\etc\hosts"
+    if ($ip) {
+        get-content -path $hosts | select-string $hostname -notmatch | out-file $hosts
+        add-content -path $hosts -value "${ip}`t`t${hostname}`t ${hostname}.ec2.internal"
+    }
+}
 function determine_tools_version() {
     $TOOLS_VERSION = $(Get-Content ${DPK_INSTALL}/setup/bs-manifest | select-string "version" | % {$_.line.split("=")[1]})
     $TOOLS_MAJOR_VERSION = $TOOLS_VERSION.split(".")[0]
@@ -148,6 +157,7 @@ function execute_psft_dpk_setup() {
   } # end switch
 }
 
+. update_hosts_file
 . determine_tools_version
 . determine_puppet_home
 . generate_response_file
