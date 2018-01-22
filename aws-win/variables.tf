@@ -1,22 +1,20 @@
 variable "platform" {
-  default     = "rhel7"
+  default     = "win2016"
   description = "The OS Platform"
 }
 
+variable "machine_name" {
+  description   = "Server name"
+}
 variable "user" {
   default = {
-    rhel7   = "ec2-user"
+    win2016   = "Administrator"
   }
-}
-
-variable "machine_name" {
-  description = "Hostname for the instance"
 }
 
 variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types "
-  # default = "ami-bf36fec5" # ps-vagabond-rhel-aws 1.0.0
-  default = "ami-c998b6b2" # AWS RHEL 7.4
+  default = "ami-2b6f3c51" # AWS Windows 2016 Base
 }
 
 variable "key_name" {
@@ -42,11 +40,6 @@ variable "instance_type" {
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
 }
 
-variable "admin_password" {
-  default = "Passw0rd!"
-  description = "Administrator password"
-}
-
 variable "tagName" {
   default     = "PeopleSoft Image"
   description = "Name tag for the servers"
@@ -64,6 +57,10 @@ variable "patch_id" {
   description = "My Oracle Support Patch Number for the PeopleSoft Image"
 }
 
+variable "admin_password" {
+  default = "Passw0rd!"
+  description = "Windows Administrator password"
+}
 # resource "template_file" "dpk_install" {
 #   template = "$/media/sf_${var.patch_id}"
 # }

@@ -2,19 +2,22 @@ provider "aws" {
   region     = "${var.region}"
 }
 
-resource "aws_instance" "vagabond" {
+data "template_file" "user_data_lnx" {
+  template = "${file("user_data.cfg")}"
+  vars {
+    admin_password = "${var.admin_password}"
+    machine_name   = "${var.machine_name}"
+    
+  }
+}
+
+resource "aws_instance" "vagabond_lnx" {
     ami = "${var.ami}"
     instance_type = "${var.instance_type}"
     key_name = "${var.key_name}"
-    security_groups = ["${aws_security_group.ps-terraform.name}"]
+    security_groups = ["${aws_security_group.ps-terraform-lnx.name}"]
     count = "${var.servers}"
-
-    user_data =  <<HEREDOC
-#! /bin/bash    
-mkswap -f /dev/xvdb
-swapon /dev/xvdb
-sed -i '$a/dev/xvdb   none    swap    sw    0   0' /etc/fstab
-HEREDOC
+    user_data = "${data.template_file.user_data_lnx.rendered}"
 
     root_block_device {
         volume_size = "200"
@@ -32,11 +35,11 @@ HEREDOC
 
     #Instance tags
     tags {
-        Name = "${var.tagName}-${var.patch_id}-${count.index}"
+        Name = "${var.tagName}-lnx-${var.patch_id}-${count.index}"
     }
 
     provisioner "file" {
-        source = "${path.module}/../config/psft_customizations.yaml"
+        source = "${path.module}/../config/psft_customizations-lnx.yaml"
         destination = "/tmp/psft_customizations.yaml"
     }
 
@@ -64,9 +67,9 @@ HEREDOC
     }
 }
 
-resource "aws_security_group" "ps-terraform" {
+resource "aws_security_group" "ps-terraform-lnx" {
     name = "ps-terraform_${var.platform}"
-    description = "ps-terraform internal traffic + maintenance."
+    description = "ps-terraform linux internal traffic + maintenance."
 
     // These are for internal traffic
     ingress {
@@ -92,15 +95,15 @@ resource "aws_security_group" "ps-terraform" {
     }
 
     ingress {
-        from_port = 8000
-        to_port = 8000
+        from_port = 1522
+        to_port = 1522
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
 
     ingress {
-        from_port = 1522
-        to_port = 1522
+        from_port = 8000
+        to_port = 8000
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }

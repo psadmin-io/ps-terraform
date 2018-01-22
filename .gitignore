@@ -9,3 +9,4 @@ google/*.json
 google*
 openstack*
 digitalocean*
+*/*.png
