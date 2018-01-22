@@ -6,3 +6,7 @@ config/psft_customizations.yaml
 *.backup
 */backends.tf
 google/*.json
+google*
+openstack*
+digitalocean*
+*/*.png

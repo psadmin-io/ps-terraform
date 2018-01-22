@@ -27,7 +27,7 @@ readonly MOS_PASSWORD=$2
 readonly PATCH_ID=$3
 readonly DPK_INSTALL=$4
 
-export DEBUG=true
+# export DEBUG=true
 
 readonly TMPDIR="$(mktemp -d)"
 readonly COOKIE_FILE="${TMPDIR}/$$.cookies"
@@ -41,7 +41,7 @@ readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
 
-declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "gcc" "gcc-c++" "openssl-devel" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio" "samba")
+declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio" "samba")
 declare -A timings
 
 ###############
@@ -319,7 +319,7 @@ function execute_puppet_apply() {
   case ${TOOLS_MINOR_VERSION} in
     "55" )
         if [[ -n ${DEBUG+x} ]]; then
-          sudo puppet apply --verbose "${PUPPET_HOME}/manifests/site.pp"
+          sudo puppet apply --verbose --debug "${PUPPET_HOME}/manifests/site.pp"
         else
           sudo puppet apply "${PUPPET_HOME}/manifests/site.pp" > /dev/null 2>&1
         fi
@@ -328,7 +328,8 @@ function execute_puppet_apply() {
         if [[ -n ${DEBUG+x} ]]; then
           sudo puppet apply \
             --confdir="${PSFT_BASE_DIR}/dpk/puppet" \
-            --verbose \
+            --verbose \ 
+            --debug \
             "${PUPPET_HOME}/production/manifests/site.pp"
         else
           sudo puppet apply \
