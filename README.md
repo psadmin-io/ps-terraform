@@ -2,6 +2,8 @@
 
 Run PeopleSoft Images on multiple cloud providers. ps-terraform uses the [ps-vagabond](https://github.com/psadmin-io/ps-vagabond) provisioner scripts to create a RedHat Linux-based PeopleSoft Image automatically.
 
+> **This is not for running production and production support instances. Verify your licensing with Oracle before using this project with a non-demonstration environment as it will impact your license agreement**.
+
 ## Required Software
 
 1. Terraform
@@ -241,4 +243,8 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Outputs:
 server_address = http://ec2-52-201-216-61.compute-1.amazonaws.com:8000/ps/signon.html
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> e67d86ba911ed7870e7a7ffa693f837190bc0750
