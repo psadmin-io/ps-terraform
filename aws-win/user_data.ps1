@@ -7,10 +7,7 @@
   $admin = [adsi]("WinNT://./administrator, user")
   $admin.psbase.invoke("SetPassword", "${admin_password}")
   netsh advfirewall set allprofiles state off
-  C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1 -Schedule
-  ($TaskScheduler = New-Object -ComObject Schedule.Service).Connect("localhost")
-  $MyTask = $TaskScheduler.GetFolder('\').GetTask("Amazon Ec2 Launch - Instance Initialization")
-  $MyTask.Enabled = $true
+
   Rename-Computer -NewName "${machine_name}"
   Restart-Computer
 </powershell>
