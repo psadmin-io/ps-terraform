@@ -95,7 +95,7 @@ resource "aws_security_group" "ps-terraform-lnx" {
     }
 
     ingress {
-        from_port = 1522
+        from_port = 1521
         to_port = 1522
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
