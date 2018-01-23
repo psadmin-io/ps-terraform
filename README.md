@@ -77,7 +77,7 @@ Save `config/psft_customizations.yaml.example` as `config/psft_customizations.ya
 | FS  | VP1     |
 | ELM | PS      |
 | CS  | PS      |
-| HUB | PS      |
+| HUB | VP1     |
 
 ### Use Terraform to build a PeopleSoft Image
 
