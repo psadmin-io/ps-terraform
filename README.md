@@ -243,8 +243,4 @@ Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
 
 Outputs:
 server_address = http://ec2-52-201-216-61.compute-1.amazonaws.com:8000/ps/signon.html
-<<<<<<< HEAD
 ```
-=======
-```
->>>>>>> e67d86ba911ed7870e7a7ffa693f837190bc0750
