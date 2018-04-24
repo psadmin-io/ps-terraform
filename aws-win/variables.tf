@@ -6,6 +6,7 @@ variable "platform" {
 variable "machine_name" {
   description   = "Server name"
 }
+
 variable "user" {
   default = {
     win2016   = "Administrator"
@@ -58,14 +59,6 @@ variable "patch_id" {
 }
 
 variable "admin_password" {
-  default = "Passw0rd!"
+  default = "SomeThingMoreS3cur#"
   description = "Windows Administrator password"
 }
-# resource "template_file" "dpk_install" {
-#   template = "$/media/sf_${var.patch_id}"
-# }
-
-# variable "dpk_install" {
-#   description = "Folder on VM where the DPK will download"
-#   default = "/media/sf_${var.patch_id}"
-# }

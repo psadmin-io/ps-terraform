@@ -69,7 +69,7 @@ instance_type = "" # Default is t2.large
 # servers = "2"
 ```
 
-Save `config/psft_customizations.yaml.example` as `config/psft_customizations.yaml`. Make sure the `db_user` account is appropriate for the Image.
+Save `config/psft_customizations.yaml.example` as `config/psft_customizations-win.yaml` or `config/psft_customizations-lnx.yaml`. Make sure the `db_user` account is appropriate for the Image.
 
 | App | DB User |
 | --- | ------- |

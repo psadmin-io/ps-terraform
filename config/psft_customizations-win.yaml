@@ -1,27 +1,34 @@
 ---
 
-peoplesoft_base:   c:/psft
-db_name:           HCMWIN
-db_name_downcase:  hcmwin
+peoplesoft_base:        c:/psft
+db_name:                PSFTDB
+db_name_downcase:       psftdb
 psft_db:
-  # type:            elm
-  location:        "%{hiera('psft_db_location')}"
-  # container_name:  CDBELM   # can specify or it will be built using CDB+type
-db_user:           PS
-db_user_pwd:       PS
-
-db_connect_id:     people
-db_connect_pwd:    peop1e
-
-access_id:         SYSADM
-access_pwd:        SYSADM
-
-pia_webprofile_name:    DEV
+  location:             "%{hiera('psft_db_location')}"
+  
 ps_config_home:         c:/psft/cfg
 
-appserver_domain_name:   "%{hiera('db_name_downcase')}"
-prcs_domain_name:        "%{hiera('db_name_downcase')}"
-pia_domain_name:         "%{hiera('db_name_downcase')}"
+# users
+db_user:                PS
+db_connect_id:          people
+access_id:              SYSADM
+pia_gateway_user:       administrator
+web_console_user:       system
+websever_user:          PTWEBSERVER
+
+# passwords
+db_user_pwd:            PS
+db_connect_pwd:         peop1e
+access_pwd:             SYSADM
+pia_gateway_user_pwd:   password
+web_console_pwd:        Passw0rd1
+domain_conn_pwd:        Passw0rd_
+webserver_pwd:          PTWEBSERVER
+     
+appserver_domain_name:  "%{hiera('db_name_downcase')}"
+prcs_domain_name:       "%{hiera('db_name_downcase')}"
+pia_domain_name:        "%{hiera('db_name_downcase')}"
+pia_webprofile_name:    DEV
 
 # The oracle_client hash is required for a fulltier to midtier change when using the PeopleTools Patch provisioner
 oracle_client_location: "%{hiera('pt_location')}/oracle-client/12.1.0.2"
@@ -57,8 +64,8 @@ pia_domain_list:
     webserver_settings:
       webserver_type:           "%{hiera('webserver_type')}"
       webserver_home:           "%{hiera('weblogic_location')}"
-      webserver_admin_user:     system
-      webserver_admin_user_pwd: Passw0rd1
+      webserver_admin_user:     "%{hiera('web_console_user')}"
+      webserver_admin_user_pwd: "%{hiera('web_console_pwd')}"
       webserver_admin_port:     "%{hiera('pia_http_port')}"
       webserver_http_port:      "%{hiera('pia_http_port')}"
       webserver_https_port:     "%{hiera('pia_https_port')}"
@@ -70,7 +77,7 @@ pia_domain_list:
         LoggingEnabled:         true
         LogFileFormat:          extended
         BufferSizeKB:           0
-        ELFFields:              'date time cs-method cs-uri sc-status cs-username cs(user-agent) s-ip c-ip cs(X-Forwarded-For) time-taken bytes x-OPRIDLogField'
+        ELFFields:              'date time cs-method cs-uri sc-status cs-username cs(user-agent) s-ip c-ip cs(X-Forwarded-For) time-taken bytes'
 
     site_list:
       "%{hiera('pia_site_name')}":
@@ -79,9 +86,7 @@ pia_domain_list:
 
         webprofile_settings:
           profile_name:        "%{hiera('pia_webprofile_name')}"
-          profile_user:        PTWEBSERVER
-          profile_user_pwd:    PTWEBSERVER
+          profile_user:        "%{hiera('websever_user')}"
+          profile_user_pwd:    "%{hiera('webserver_pwd')}"
 
         report_repository_dir: "%{hiera('report_repository_dir')}"
-
-# domain_conn_pwd: "Passw0rd_"
