@@ -5,7 +5,7 @@ variable "platform" {
 
 variable "user" {
   default = {
-    rhel7   = "ec2-user"
+    rhel7 = "ec2-user"
   }
 }
 
@@ -15,6 +15,7 @@ variable "machine_name" {
 
 variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types "
+
   # default = "ami-bf36fec5" # ps-vagabond-rhel-aws 1.0.0
   default = "ami-c998b6b2" # AWS RHEL 7.4
 }
@@ -38,12 +39,12 @@ variable "servers" {
 }
 
 variable "instance_type" {
-  default     = "t2.large" # 2 CPU, 8GB RAM, Moderate performance
+  default     = "t2.large"                                                                                                      # 2 CPU, 8GB RAM, Moderate performance
   description = "AWS Instance type, if you change, make sure it is compatible with AMI, not all AMIs allow all instance types "
 }
 
 variable "admin_password" {
-  default = "Passw0rd!"
+  default     = "DontUs3TH!sP@ssw0rd!"
   description = "Administrator password"
 }
 
@@ -68,7 +69,9 @@ variable "patch_id" {
 #   template = "$/media/sf_${var.patch_id}"
 # }
 
+
 # variable "dpk_install" {
 #   description = "Folder on VM where the DPK will download"
 #   default = "/media/sf_${var.patch_id}"
 # }
+
