@@ -13,3 +13,4 @@ key_path = "~/path/to/terraform.pem"
 # Number of Servers
 # Default is 1
 # servers = "1"
+admin_password = ""
