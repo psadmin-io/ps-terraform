@@ -184,4 +184,5 @@ resource "aws_security_group" "ps-terraform-win" {
 resource "aws_key_pair" "terraform-keys" {
   key_name   = "${var.key_name}"
   public_key = "${var.key_path}"
+
 }
