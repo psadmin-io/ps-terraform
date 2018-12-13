@@ -9,7 +9,7 @@ psft_db:
 ps_config_home:         c:/psft/cfg
 
 # users
-db_user:                PS
+db_user:                VP1
 db_connect_id:          people
 access_id:              SYSADM
 pia_gateway_user:       administrator
@@ -17,7 +17,7 @@ web_console_user:       system
 websever_user:          PTWEBSERVER
 
 # passwords
-db_user_pwd:            PS
+db_user_pwd:            VP1
 db_connect_pwd:         peop1e
 access_pwd:             SYSADM
 pia_gateway_user_pwd:   password
