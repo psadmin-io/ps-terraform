@@ -15,7 +15,7 @@ variable "user" {
 
 variable "ami" {
   description = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types "
-  default = "ami-2b6f3c51" # AWS Windows 2016 Base
+  default = "ami-0da19d4527d55af09" # AWS Windows 2016 Base
 }
 
 variable "key_name" {
