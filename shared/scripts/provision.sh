@@ -40,7 +40,7 @@ readonly PATCH_FILE_LIST="${TMPDIR}/file_list"
 readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
-readonly PSFT_CFG_DIR="${PSFT_CFG_DIR}"
+readonly PSFT_CFG_DIR="${PSFT_BASE_DIR}/cfg"
 
 declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio" "samba")
 declare -A timings

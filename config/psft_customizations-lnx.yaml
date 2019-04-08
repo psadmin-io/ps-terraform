@@ -9,12 +9,27 @@
 #                              Required Settings                               #
 ################################################################################
 
-db_name:     "HCMLNX"
-db_port:     1522
-db_user:     "PS"
-db_user_pwd: "PS"
-db_connect_id:     "people"
-db_connect_pwd:    "peop1e"
+db_name:           PSFTDB
+db_name_downcase:  psftdb
+psft_db:
+  # type:            elm
+  location:        "%{hiera('psft_db_location')}"
+  # container_name:  CDBELM   # can specify or it will be built using CDB+type
+db_user:           VP1
+db_user_pwd:       VP1
+
+db_connect_id:     people
+db_connect_pwd:    peop1e
+
+access_id:         SYSADM
+access_pwd:        SYSADM
+
+pia_webprofile_name:    DEV
+ps_config_home:         "%{hiera('peoplesoft_base')}/cfg"
+
+appserver_domain_name:   "%{hiera('db_name_downcase')}"
+prcs_domain_name:        "%{hiera('db_name_downcase')}"
+pia_domain_name:         "%{hiera('db_name_downcase')}"
 
 # The oracle_client hash is required for a fulltier to midtier change when using the PeopleTools Patch provisioner
 oracle_client_location: "%{hiera('pt_location')}/oracle-client/12.1.0.2"
@@ -28,12 +43,8 @@ ps_home:
   location:   "%{hiera('ps_home_location')}"
   remove:     false
 
-pia_webprofile_name:    DEV
-pia_psserver_list:      "localhost:%{hiera('jolt_port')}"
-# ps_config_home:         "%{hiera('user_home_dir')}/psft/cfg"
-
-# Set ps_app_home for Puppet rebuild when applying a PT Patch
-ps_apphome_location:  "%{hiera('peoplesoft_base')}/pt/ps_app_home"
+ps_app_home:  
+  location:    "%{hiera('peoplesoft_base')}/pt/ps_app_home"
 
 db_service_name: "%{hiera('db_name')}"
 
@@ -54,19 +65,34 @@ pia_domain_list:
     webserver_settings:
       webserver_type:           "%{hiera('webserver_type')}"
       webserver_home:           "%{hiera('weblogic_location')}"
-      webserver_admin_user:     "system"
-      webserver_admin_user_pwd: "Passw0rd"
+      webserver_admin_user:     system
+      webserver_admin_user_pwd: Passw0rd1
       webserver_admin_port:     "%{hiera('pia_http_port')}"
       webserver_http_port:      "%{hiera('pia_http_port')}"
       webserver_https_port:     "%{hiera('pia_https_port')}"
+
+    config_settings:
+      "SecurityConfiguration/%{hiera('db_name')}":
+        EnforceValidBasicAuthCredentials: false
+      Servers/PIA:
+        ListenAddress:          0.0.0.0
+        WeblogicPluginEnabled:  true
+      Servers/PIA/WebServer/PIA/WebServerLog/PIA: 
+        LoggingEnabled:         true
+        LogFileFormat:          extended
+        BufferSizeKB:           0
+        ELFFields:              'date time cs-method cs-uri sc-status cs-username cs(user-agent) s-ip c-ip cs(X-Forwarded-For) time-taken bytes x-OPRIDLogField'
+
     site_list:
       "%{hiera('pia_site_name')}":
         appserver_connections: "%{hiera('pia_psserver_list')}"
         domain_conn_pwd:       "%{hiera('domain_conn_pwd')}"
+
         webprofile_settings:
           profile_name:        "%{hiera('pia_webprofile_name')}"
-          profile_user:        "PTWEBSERVER"
-          profile_user_pwd:    "PTWEBSERVER"
+          profile_user:        PTWEBSERVER
+          profile_user_pwd:    PTWEBSERVER
+
         report_repository_dir: "%{hiera('report_repository_dir')}"
 
 # domain_conn_pwd: "Passw0rd_"
