@@ -15,8 +15,8 @@ psft_db:
   # type:            elm
   location:        "%{hiera('psft_db_location')}"
   # container_name:  CDBELM   # can specify or it will be built using CDB+type
-db_user:           VP1
-db_user_pwd:       VP1
+db_user:           PS
+db_user_pwd:       PS
 
 db_connect_id:     people
 db_connect_pwd:    peop1e
@@ -50,7 +50,7 @@ db_service_name: "%{hiera('db_name')}"
 
 tns_admin_list:
   "%{hiera('db_name')}":
-    db_host: "localhost"  ## NOTE: Change this to "%{::fqdn}" if using bridged networking
+    db_host:         "localhost" 
     db_port:         "%{hiera('db_port')}"
     db_protocol:     TCP
     db_service_name: "%{hiera('db_service_name')}"
@@ -72,14 +72,19 @@ pia_domain_list:
       webserver_https_port:     "%{hiera('pia_https_port')}"
 
     config_settings:
-      "SecurityConfiguration/%{hiera('db_name')}":
-        EnforceValidBasicAuthCredentials: false
       Servers/PIA:
         ListenAddress:          0.0.0.0
         WeblogicPluginEnabled:  true
       Servers/PIA/WebServer/PIA/WebServerLog/PIA: 
         LoggingEnabled:         true
         LogFileFormat:          extended
+        LogTimeInGMT:           false
+        RotationType:           byTime
+        FileName:               './logs/PIA_access.log'
+        FileTimeSpan:           24
+        NumberOfFilesLimited:   false
+        RotateLogOnStartup:     false
+        RotationTime:           '00:00'
         BufferSizeKB:           0
         ELFFields:              'date time cs-method cs-uri sc-status cs-username cs(user-agent) s-ip c-ip cs(X-Forwarded-For) time-taken bytes x-OPRIDLogField'
 
