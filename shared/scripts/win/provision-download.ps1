@@ -152,9 +152,9 @@ function install_additional_packages {
   if (-Not (Test-Path C:\ProgramData\chocolatey\bin\wget.exe)) {
     Write-Host "Installing wget"
     if ($DEBUG -eq "true") {
-      choco install wget -y
+      choco install wget --version 1.19.4 -y
     } else {
-      choco install wget -y 2>&1 | out-null
+      choco install wget --version 1.19.4 -y 2>&1 | out-null
     }
   }
   If (Test-Path Alias:wget) { Remove-Item Alias:wget 2>&1 | out-null }
