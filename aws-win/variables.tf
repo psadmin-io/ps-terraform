@@ -5,6 +5,7 @@ variable "platform" {
 
 variable "machine_name" {
   description   = "Server name"
+  default       = "psterraform"
 }
 
 variable "user" {
