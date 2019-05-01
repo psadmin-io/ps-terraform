@@ -279,8 +279,12 @@ function unpack_setup_scripts() {
     Write-Host "Unpacking DPK setup scripts"
     if ($DEBUG -eq "true") {
       get-childitem "${DPK_INSTALL}/*.zip" | % { Expand-Archive $_ -DestinationPath ${DPK_INSTALL} -Force}
+      # Remove downloaded .zip files so Bootstrap doesn't re-extract them
+      remove-item "*-920-UPD-*.zip"
     } else {
       get-childitem "${DPK_INSTALL}/*.zip" | % { Expand-Archive $_ -DestinationPath ${DPK_INSTALL} -Force}  2>&1 | out-null
+      # Remove downloaded .zip files so Bootstrap doesn't re-extract them
+      remove-item "*-920-UPD-*.zip" 2>&1 | out-null
     }
 	
 	if (-Not (test-path $DPK_INSTALL/setup/*)){

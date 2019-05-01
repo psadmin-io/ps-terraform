@@ -68,6 +68,16 @@ resource "aws_instance" "terraform-win" {
     destination = "c:/temp/provision-puppet-apply.ps1"
   }
 
+  provisioner "file" {
+    source      = "${path.module}/../shared/scripts/win/provision-utilities.ps1"
+    destination = "c:/temp/provision-utilities.ps1"
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/../shared/scripts/win/provision-ami-prep.ps1"
+    destination = "c:/temp/provision-ami-prep.ps1"
+  }
+
   provisioner "remote-exec" {
     connection = {
       type     = "winrm"
@@ -136,6 +146,20 @@ resource "aws_instance" "terraform-win" {
     inline = [
       "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
       "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-puppet-apply.ps1 -DPK_INSTALL c:/psft/dpk/download/${var.patch_id} -PSFT_BASE_DIR c:/psft -PUPPET_HOME c:/psft/dpk/puppet",
+    ]
+  }
+
+  provisioner "remote-exec" {
+    connection = {
+      type     = "winrm"
+      user     = "Administrator"
+      password = "${var.admin_password}"
+      agent    = "false"
+    }
+
+    inline = [
+      "powershell.exe Set-ExecutionPolicy RemoteSigned -force",
+      "powershell.exe -ExecutionPolicy Bypass -File c:\\temp\\provision-puppet-utilities.ps1",
     ]
   }
 }
