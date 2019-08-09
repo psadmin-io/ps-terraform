@@ -279,7 +279,6 @@ function unpack_setup_scripts() {
     Write-Host "Unpacking DPK setup scripts"
     if ($DEBUG -eq "true") {
       get-childitem "${DPK_INSTALL}/*.zip" | % { Expand-Archive $_ -DestinationPath ${DPK_INSTALL} -Force}
-      remove
     } else {
       get-childitem "${DPK_INSTALL}/*.zip" | % { Expand-Archive $_ -DestinationPath ${DPK_INSTALL} -Force}  2>&1 | out-null
     }
