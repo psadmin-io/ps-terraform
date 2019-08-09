@@ -40,6 +40,8 @@ readonly PATCH_FILE_LIST="${TMPDIR}/file_list"
 readonly PSFT_BASE_DIR="/opt/oracle/psft"
 readonly VAGABOND_STATUS="${DPK_INSTALL}/vagabond.json"
 readonly CUSTOMIZATION_FILE="/tmp/psft_customizations.yaml"
+# used with ps-vagabond
+# readonly PSFT_CFG_DIR="${PSFT_CFG_DIR}"
 
 declare -a additional_packages=("vim-enhanced" "jq" "htop" "wget" "python-pip" "PyYAML" "python-requests" "aria2-1.32.0-1.el7.centos.x86_64" "unzip" "libaio" "samba")
 declare -A timings
@@ -131,7 +133,7 @@ function update_packages() {
 # function build_aria2() {
 #   echoinfo "Building aria2c"
 #   local begin=$(date +%s)
-#   if [[ -n ${DEBUG+x} ]]; then
+#   if [[ -n ${DEBUG+x} ]]; then
 #     wget https://github.com/aria2/aria2/releases/download/release-1.32.0/aria2-1.32.0.tar.gz
 #     tar xvf aria2-1.32.0.tar.gz
 #     cd ~/aria2-1.32.0
@@ -153,9 +155,9 @@ function install_additional_packages() {
   for package in "${additional_packages[@]}"; do
     if [[ -n ${DEBUG+x} ]]; then
       echodebug "Installing ${package}"
-      sudo yum -y install "${package}"
+      sudo yum install -y "${package}"
     else
-      sudo yum -y install "${package}" > /dev/null 2>&1
+      sudo yum install -y "${package}" > /dev/null 2>&1
     fi
   done
   local end=$(date +%s)
@@ -168,7 +170,7 @@ function create_authorization_cookie() {
   # shellcheck disable=2155
   local MOS_TOKEN="$(curl --silent --head https://updates.oracle.com/Orion/Services/download | grep Location | cut -d '=' -f 2|cut -d ' ' -f 1)"
   local AUTH_DATA="ssousername=$MOS_USERNAME&password=$MOS_PASSWORD&site2pstoretoken=$MOS_TOKEN"
-  wget --secure-protocol=TLSv1 \
+  wget --secure-protocol=auto \
     --save-cookies="${COOKIE_FILE}" \
     --keep-session-cookies \
     --no-check-certificate \
@@ -184,7 +186,7 @@ function download_search_results() {
   echodebug "Downloading search page results for ${PATCH_ID}"
   # plat_lang 226P = Linux x86_64
   # plat_lang 233P = Windows x86_64
-  wget --secure-protocol=TLSv1 \
+  wget --secure-protocol=auto \
     --no-check-certificate \
     --load-cookies="${COOKIE_FILE}" \
     --output-document="${PATCH_SEARCH_OUTPUT}" \
@@ -219,7 +221,7 @@ function download_patch_files() {
       --quiet=true \
       --file-allocation=none \
       --log="${DOWNLOAD_LOGFILE}" \
-      --log-level="info" 
+      --log-level="info"
     record_step_success "${FUNCNAME[0]}"
     local end=$(date +%s)
     local tottime="$((end - begin))"
@@ -264,6 +266,9 @@ function determine_puppet_home() {
         PUPPET_HOME="/etc/puppet"
       ;;
     "56" )
+        PUPPET_HOME="${PSFT_BASE_DIR}/dpk/puppet"
+      ;;
+    "57" )
         PUPPET_HOME="${PSFT_BASE_DIR}/dpk/puppet"
       ;;
     * )
@@ -319,7 +324,7 @@ function execute_puppet_apply() {
   case ${TOOLS_MINOR_VERSION} in
     "55" )
         if [[ -n ${DEBUG+x} ]]; then
-          sudo puppet apply --verbose --debug "${PUPPET_HOME}/manifests/site.pp"
+          sudo puppet apply --verbose "${PUPPET_HOME}/manifests/site.pp"
         else
           sudo puppet apply "${PUPPET_HOME}/manifests/site.pp" > /dev/null 2>&1
         fi
@@ -328,8 +333,19 @@ function execute_puppet_apply() {
         if [[ -n ${DEBUG+x} ]]; then
           sudo puppet apply \
             --confdir="${PSFT_BASE_DIR}/dpk/puppet" \
-            --verbose \ 
-            --debug \
+            --verbose \
+            "${PUPPET_HOME}/production/manifests/site.pp"
+        else
+          sudo puppet apply \
+            --confdir="${PSFT_BASE_DIR}/dpk/puppet" \
+            "${PUPPET_HOME}/production/manifests/site.pp" > /dev/null 2>&1
+        fi
+      ;;
+      "57" )
+        if [[ -n ${DEBUG+x} ]]; then
+          sudo puppet apply \
+            --confdir="${PSFT_BASE_DIR}/dpk/puppet" \
+            --verbose \
             "${PUPPET_HOME}/production/manifests/site.pp"
         else
           sudo puppet apply \
@@ -344,6 +360,28 @@ function execute_puppet_apply() {
   local end=$(date +%s)
   local tottime="$((end - begin))"
   timings[execute_puppet_apply]=$tottime
+}
+
+function execute_pre_setup() {
+  local begin=$(date +%s)
+  echoinfo "Executing Pre setup script"
+  if [[ -n ${DEBUG+x} ]]; then
+    if [ ! -z "${PSFT_CFG_DIR}" ]; then
+      echodebug "Pre making PS_CFG_HOME"
+      sudo mkdir -pv "${PSFT_CFG_DIR}"
+      sudo chmod -v 777 "${PSFT_CFG_DIR}"
+    else
+      echodebug 'Skipping pre make PS_CFG_HOME, $PSFT_CFG_DIR not set.'
+    fi
+  else
+    if [ ! -z "${PSFT_CFG_DIR}" ]; then
+      sudo mkdir -p "${PSFT_CFG_DIR}" > /dev/null 2>&1
+      sudo chmod 777 "${PSFT_CFG_DIR}" > /dev/null 2>&1
+    fi
+  fi
+  local end=$(date +%s)
+  local tottime="$((end - begin))"
+  timings[execute_pre_setup]=$tottime
 }
 
 function execute_psft_dpk_setup() {
@@ -374,6 +412,22 @@ function execute_psft_dpk_setup() {
         fi
       ;;
     "56" )
+        generate_response_file
+        if [[ -n ${DEBUG+x} ]]; then
+          sudo "${DPK_INSTALL}/setup/psft-dpk-setup.sh" \
+            --dpk_src_dir="${DPK_INSTALL}" \
+            --customization_file="${CUSTOMIZATION_FILE}" \
+            --silent \
+            --response_file "${DPK_INSTALL}/response.cfg"
+        else
+          sudo "${DPK_INSTALL}/setup/psft-dpk-setup.sh" \
+            --dpk_src_dir="${DPK_INSTALL}" \
+            --customization_file="${CUSTOMIZATION_FILE}" \
+            --silent \
+            --response_file "${DPK_INSTALL}/response.cfg" > /dev/null 2>&1
+        fi
+      ;;
+      "57" )
         generate_response_file
         if [[ -n ${DEBUG+x} ]]; then
           sudo "${DPK_INSTALL}/setup/psft-dpk-setup.sh" \
@@ -465,6 +519,7 @@ determine_tools_version
 determine_puppet_home
 
 # Running the setup script
+execute_pre_setup
 execute_psft_dpk_setup
 
 # Postrequisite fixes
