@@ -1,4 +1,4 @@
-# Configure the Oracle Cloud Infrastructure provider with an API Key
+
 provider "oci" {
   tenancy_ocid = "${var.tenancy_ocid}"
   user_ocid = "${var.user_ocid}"
@@ -7,7 +7,6 @@ provider "oci" {
   region = "${var.region}"
 }
 
-# Data Sources
 data {
   oci_identity_availability_domains {
     primary_availability_domains {

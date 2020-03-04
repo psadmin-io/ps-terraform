@@ -139,7 +139,7 @@ function record_step_success($step) {
 }
 
 function install_additional_packages {
-
+  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls13, [Net.SecurityProtocolType]::Tls12 
   if (-Not (Test-Path C:\ProgramData\chocolatey\bin)) {
     Write-Host "Installing Chocolatey Package Manager"
     if ($DEBUG -eq "true") {

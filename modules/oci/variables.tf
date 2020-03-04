@@ -15,7 +15,7 @@ variable "private_key_path" {
 }
 
 variable "region"{
-  default = "us-ashburn-1"
+  default = "us-phoenix-1"
   description = "OCI Region"
 }
 
