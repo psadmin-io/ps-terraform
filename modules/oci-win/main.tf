@@ -4,6 +4,10 @@ locals { # TODO - move these files to sub-module level, not base?
     templates_dir = "${path.module}/../../files/templates"
 }
 
+data "oci_core_vcn" "main" {
+   vcn_id = data.oci_core_subnet.main.vcn_id
+}
+
 data "oci_core_subnet" "main" {
   subnet_id     = var.subnet_id
 }
@@ -19,6 +23,7 @@ data "template_file" "user_data" {
     admin_user    = var.admin_user
     admin_pass    = var.admin_pass
     hostname      = var.hostname
+    dns_label     = "${data.oci_core_vcn.main.dns_label}.oraclevcn.com"
     subnet_domain = data.oci_core_subnet.main.subnet_domain_name
     ip            = "127.0.0.1"   #TODO
   }
