@@ -24,5 +24,5 @@ module "ps-terraform" {
   image_id           = "<TODO>"
   mos_username       = "<TODO>"
   mos_password       = "<TODO>"
-  patch_id           = "<TODO>"
+  mos_patch_id       = "<TODO>"
 }

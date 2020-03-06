@@ -9,5 +9,5 @@ module "oci-win" {
   image_id           = var.image_id
   mos_username       = var.mos_username
   mos_password       = var.mos_password
-  patch_id           = var.patch_id
+  mos_patch_id       = var.mos_patch_id
 }

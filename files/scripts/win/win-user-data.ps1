@@ -6,10 +6,10 @@ _<powershell>
 
   # Remove old hostnames
   get-content -path $hosts | select-string $hostname -notmatch | out-file $hosts
-  add-content -path $hosts -value "${ip} ${hostname} ${hostname}.${subnet_domain}"
+  add-content -path $hosts -value "$${ip}`t`t$${hostname}`t`t$${hostname}.$${dns_label}"
   #add-content -path $hosts -value "$${ip}`t`t$${env:computername}`t`t$${env:computername}.$${{subnet_dns}.$${dns_suffix}"
   # add psterraform for Oracle Listener configuration # TODO
-  #add-content -path $hosts -value "${ip} psterraform psterraform.${subnet_domain}"
+  add-content -path $hosts -value "$${ip}`t`tpsterraform`t`tpsterraform.$${dns_label}"
 
   # Disable windows firewall
   netsh advfirewall set allprofiles state off  
@@ -22,27 +22,12 @@ _<powershell>
   # [Environment]::SetEnvironmentVariable("NODENAME", $hostname)
   # [Environment]::SetEnvironmentVariable("NODENAME", $hostname, [System.EnvironmentVariableTarget]::Machine)
 
-  # Set Timezone
-  Set-TimeZone -Name "Central Standard Time"
+  # # Set Timezone
+  # Set-TimeZone -Name "Central Standard Time"
 
   # TODO - winrm settings needed?
   winrm set winrm/config/service/Auth '@{Basic="true"}'
   winrm set winrm/config/service '@{AllowUnencrypted="true"}'
   winrm set winrm/config/winrs '@{MaxMemoryPerShellMB="1024"}' 
-
-  # psft-pi-baker deployment
-  # init
-  Set-ExecutionPolicy RemoteSigned -force
-  [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls13, [Net.SecurityProtocolType]::Tls12 
-  New-Item -ItemType directory -Path "c:/temp" #todo pass location?
-  Push-Location "c:/temp"
-  (Invoke-Expression ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')))
-  refreshenv
-  choco install git -y
-  refreshenv # todo refresh is not working?
-  C:\PROGRA~1\Git\bin\git clone https://github.com/psadmin-io/psft-pi-baker.git
-  # install
-  Push-Location "./psft-pi-baker"
-  ./bake.ps1 -MOS_USERNAME "${mos_username}" -MOS_PASSWORD "${mos_password}" -MOS_PATCH_ID "${mos_patch_id}"
 
 </powershell>

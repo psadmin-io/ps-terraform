@@ -11,7 +11,7 @@ variable "mos_password" {
   description = "My Oracle Support Password"
 }
 
-variable "patch_id" {
+variable "mos_patch_id" {
   description = "My Oracle Support Patch Number for the PeopleSoft Image"
 }
 
